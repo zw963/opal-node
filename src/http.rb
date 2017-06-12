@@ -33,7 +33,9 @@ port = 1337
 # 第一步: 添加一个 HTTP 模块
 
 module HTTP
+  class Server
 
+  end
 end
 
 HTTP::Server.listen(port) do |req, res|
