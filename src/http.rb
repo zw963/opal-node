@@ -53,13 +53,14 @@ module HTTP
       # 主要是为了让传入的参数作为一个 Ruby 对象, 可以直接在 block 中工作.
       # 因此, 将原始 createServer 传入的对象, 使用 Native 包装了一下.
       http.createServer(->(req, res) {
-          block.call(Native(req), Native(res))
+          status, headers, response = block.call(Native(req), Native(res))
+          res.JS.writeHead(status, headers.to_n)
+          res.JS.end(response)
         }).listen(port)
     end
   end
 end
 
-HTTP::Server.listen(port) do |_req, res|
-  res.writeHead(200, {'Content-Type': 'text/plain'})
-  res.end "Hello World\n"
+HTTP::Server.listen(port) do |req, res|
+  [200, {'Content-Type': 'text/plain'}, "Hello World\n"]
 end
