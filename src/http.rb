@@ -34,7 +34,9 @@ port = 1337
 
 module HTTP
   class Server
+    def self.listen(port, &block)
 
+    end
   end
 end
 
