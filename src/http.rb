@@ -1,7 +1,7 @@
 require 'nodejs'
 
 http = node_require('http')
-port = 1337
+port = 1338
 
 # `
 # http.createServer(function(req, res) {
@@ -40,12 +40,26 @@ module HTTP
       # 好吧, 这里失败的原因是:
       # callback 传入了一个 res 对象, 但是这是一个 native 对象.
       # 在传入的 block 之中, 直接在 native 对象之上调用 writeHead 方法, 是不存在的.
-      http.createServer(&block).listen(port)
+
+      # 好吧, 唯一的办法是, 自己来写这个 block, 并在 block 中, 针对 res 做特殊处理.
+      # - 原来的办法是: 你把 block 传进来, JS 函数直接调这个 block.
+      # - 现在的办法是: 我自己写 block 让 JS 来调, 而 block 的内容是:
+      #   调用传进来的 block. (好吧, 就类似于做了一个 method wrapper, 对参数做了包装.)
+
+      # 原来的实现
+      # http.createServer(&block).listen(port)
+
+      # 现在工作版的实现.
+      # 主要是为了让传入的参数作为一个 Ruby 对象, 可以直接在 block 中工作.
+      # 因此, 将原始 createServer 传入的对象, 使用 Native 包装了一下.
+      http.createServer(->(req, res) {
+          block.call(Native(req), Native(res))
+        }).listen(port)
     end
   end
 end
 
 HTTP::Server.listen(port) do |_req, res|
-  res.JS.writeHead(200, {'Content-Type': 'text/plain'}.to_n)
-  res.JS.end "Hello World\n"
+  res.writeHead(200, {'Content-Type': 'text/plain'})
+  res.end "Hello World\n"
 end
