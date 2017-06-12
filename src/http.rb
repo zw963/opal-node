@@ -36,12 +36,16 @@ module HTTP
       # 首先我们需要一个 native 的 http_wrapper 变量.
       http = Native(node_require('http'))
       # 变量之上调用方法, 并传入 block 作为参数, 应该工作?
+
+      # 好吧, 这里失败的原因是:
+      # callback 传入了一个 res 对象, 但是这是一个 native 对象.
+      # 在传入的 block 之中, 直接在 native 对象之上调用 writeHead 方法, 是不存在的.
       http.createServer(&block).listen(port)
     end
   end
 end
 
-HTTP::Server.listen(port) do |req, res|
-  res.writeHead(200, {'Content-Type': 'text/plain'})
-  res.end "Hello World\n"
+HTTP::Server.listen(port) do |_req, res|
+  res.JS.writeHead(200, {'Content-Type': 'text/plain'}.to_n)
+  res.JS.end "Hello World\n"
 end
