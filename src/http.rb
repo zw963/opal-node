@@ -33,10 +33,10 @@ port = 1337
 module HTTP
   class Server
     def self.listen(port, &block)
-      # 我们还是先使用 x-string 的方式来实现.
-      %x|
-        http.createServer(#{block.to_proc}).listen(#{port});
-        |
+      # 首先我们需要一个 native 的 http_wrapper 变量.
+      http = Native(node_require('http'))
+      # 变量之上调用方法, 并传入 block 作为参数, 应该工作?
+      http.createServer(&block).listen(port)
     end
   end
 end
