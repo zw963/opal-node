@@ -30,6 +30,12 @@ port = 1337
 # 但是以上方式仍然不够好, 因为我们仍旧需要调用 wrap Native 两次, 而且也不是纯 Ruby 代码.
 # 我们期望的是下面这种更 Ruby 的解决方案. (这个 commit 并不工作.)
 
+# 第一步: 添加一个 HTTP 模块
+
+module HTTP
+
+end
+
 HTTP::Server.listen(port) do |req, res|
   res.writeHead(200, {'Content-Type': 'text/plain'})
   res.end "Hello World\n"
