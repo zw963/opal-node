@@ -1,7 +1,8 @@
 require 'opal'
 
-Dir['src/*.rb'].each { |rb_file|
+Dir['src/*.rb'].each do |rb_file|
   desc "Build and run #{rb_file}"
+
   basename = File.basename(rb_file, '.rb')
   task basename do
     puts "Building #{basename}"
@@ -10,4 +11,4 @@ Dir['src/*.rb'].each { |rb_file|
     system 'say running'
     system "node #{basename}.js"
   end
-}
+end
